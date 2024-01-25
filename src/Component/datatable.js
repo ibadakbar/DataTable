@@ -4,8 +4,6 @@ const Datatable = ({
     filteredData,
     renderTooltipContent,
     columns
-
-
 }) => {
     return (
         <table border={'1'}>
@@ -13,9 +11,9 @@ const Datatable = ({
                 <tr>
                     <th className='main-column' scope="col" >User Name</th>
                     {
-                        columns.map(col => (<>
+                        columns.map(col => (
                             <th className='column-width' scope="col">{col?.title}</th>
-                        </>))
+                        ))
                     }
                 </tr>
             </thead>
