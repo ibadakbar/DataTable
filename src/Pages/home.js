@@ -2,30 +2,24 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Datatable from '../Component/datatable';
 import Searchbar from '../Component/searchbar';
+import { debounce } from '../Config/utils';
 
 const Table = () => {
 
     const [userData, setUserData] = useState([]);
-    const [text, setText] = useState('');
-    const [filteredData, setFilteredData] = useState([]);
+    const [text, setText] = useState('manalliaquat');
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://api.github.com/users/manalliaquat/followers');
+                const response = await axios.get(`https://api.github.com/users/${text}/followers`);
                 setUserData(response.data);
             } catch (error) {
-                console.error('Error', error);
+                setUserData([]);
             }
         };
         fetchData();
-    }, []);
-
-    useEffect(() => {
-        if (!text) {
-            setFilteredData(userData);
-        }
-    }, [text, userData]);
+    }, [text]);
 
     const renderTooltipContent = (data, maxLength) => (
         <>
@@ -38,14 +32,14 @@ const Table = () => {
 
     const handleSearch = (event) => {
         const query = event.target.value.toLowerCase();
-        const filteredResults = userData.filter((user) =>
-            Object.values(user).some((value) =>
-                String(value).toLowerCase().includes(query.toLowerCase())
-            )
-        );
-        setText(query)
-        setFilteredData(filteredResults);
+        if (!query) {
+            setText('manalliaquat')
+        } else {
+            setText(query);
+        }
+
     };
+    const debouncedHandleSearch = debounce(handleSearch, 1000);
 
     const columns = [
         { title: 'ID' },
@@ -69,14 +63,14 @@ const Table = () => {
         <div className='m-4'>
             <div className="wrapper">
                 <div className="searchBar">
-                    <Searchbar handleSearch={handleSearch} />
+                    <Searchbar handleSearch={debouncedHandleSearch} />
                 </div>
             </div>
 
             <div className='scrollable-table-container'>
                 <Datatable
                     renderTooltipContent={renderTooltipContent}
-                    filteredData={filteredData}
+                    filteredData={userData}
                     columns={columns}
                 />
             </div>
